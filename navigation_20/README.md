@@ -1,16 +1,7 @@
 # navigation_20
+Nama    : Siti Intan Nia
+NPM     : 4522210054
 
-A new Flutter project.
-
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Tujuan
+Memahami dan mempraktikkan penerapan navigasi antar layar (screen) pada aplikasi Flutter menggunakan Navigator dan named routes.
+Praktikum ini membantu mahasiswa memahami cara berpindah dari satu halaman ke halaman lain, mengirim dan menerima data antar halaman, serta membangun struktur aplikasi multi-screen yang efisien dan mudah dikelola

@@ -4,12 +4,17 @@ void main() {
   runApp(const MyApp());
 }
 
-// Kelas untuk merepresentasikan data item
+// Model data Item
 class Item {
   final int id;
   final String name;
+  final String description;
 
-  Item({required this.id, required this.name});
+  Item({
+    required this.id,
+    required this.name,
+    required this.description,
+  });
 }
 
 // Aplikasi utama
@@ -21,101 +26,58 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  // State untuk melacak item yang dipilih
   Item? _selectedItem;
 
-  // Daftar item contoh
   final List<Item> _items = [
-    Item(id: 1, name: 'Item 1'),
-    Item(id: 2, name: 'Item 2'),
-    Item(id: 3, name: 'Item 3'),
+    Item(id: 1, name: 'Item 1', description: 'Deskripsi untuk Item 1'),
+    Item(id: 2, name: 'Item 2', description: 'Deskripsi untuk Item 2'),
+    Item(id: 3, name: 'Item 3', description: 'Deskripsi untuk Item 3'),
   ];
 
-  // Fungsi untuk menangani pemilihan item
   void _selectItem(Item item) {
     setState(() {
       _selectedItem = item;
     });
   }
 
-  // Fungsi untuk kembali ke HomeScreen
-  void _clearSelection() {
-    setState(() {
-      _selectedItem = null;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Navigator 2.0 App',
-      theme: ThemeData(
-        primarySwatch: Colors.teal,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-        textTheme: const TextTheme(
-          bodyMedium: TextStyle(fontSize: 16),
-        ),
-      ),
-      home: Navigator(
-        // Daftar pages didefinisikan secara deklaratif
-        pages: [
-          // Selalu tampilkan HomeScreen
-          MaterialPage(
-            key: const ValueKey('HomeScreen'),
-            child: HomeScreen(
-              items: _items,
-              onItemSelected: _selectItem,
-            ),
-          ),
-          // Tampilkan DetailScreen jika ada item yang dipilih
-          if (_selectedItem != null)
-            MaterialPage(
-              key: ValueKey(_selectedItem),
-              child: DetailScreen(
-                item: _selectedItem!,
-                onBack: _clearSelection,
-              ),
-            ),
-        ],
-        // Menangani pop (kembali) dari tumpukan navigasi
-        onPopPage: (route, result) {
-          if (!route.didPop(result)) return false;
-          // Bersihkan item yang dipilih saat pop
-          _clearSelection();
-          return true;
-        },
-      ),
+      title: 'Navigator Demo',
+      initialRoute: '/',
+      routes: {
+        '/': (context) => HomeScreen(items: _items, onItemTap: _selectItem),
+        '/detail': (context) => DetailScreen(item: _selectedItem),
+      },
     );
   }
 }
 
-// Layar Utama (HomeScreen)
+// Layar Home
 class HomeScreen extends StatelessWidget {
   final List<Item> items;
-  final Function(Item) onItemSelected;
+  final Function(Item) onItemTap;
 
   const HomeScreen({
     super.key,
     required this.items,
-    required this.onItemSelected,
+    required this.onItemTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Home'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text('Home')),
       body: ListView.builder(
         itemCount: items.length,
         itemBuilder: (context, index) {
           final item = items[index];
           return ListTile(
             title: Text(item.name),
-            subtitle: Text('ID: ${item.id}'),
-            onTap: () => onItemSelected(item),
-            trailing: const Icon(Icons.arrow_forward),
+            onTap: () {
+              onItemTap(item);
+              Navigator.pushNamed(context, '/detail');
+            },
           );
         },
       ),
@@ -123,43 +85,51 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-// Layar Detail (DetailScreen)
+// Layar Detail
 class DetailScreen extends StatelessWidget {
-  final Item item;
-  final VoidCallback onBack;
+  final Item? item;
 
-  const DetailScreen({
-    super.key,
-    required this.item,
-    required this.onBack,
-  });
+  const DetailScreen({super.key, required this.item});
 
   @override
   Widget build(BuildContext context) {
+    if (item == null) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Detail')),
+        body: const Center(child: Text('Item tidak ditemukan')),
+      );
+    }
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Detail: ${item.name}'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: Text('Detail - ${item!.name}')),
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center, // Vertikal tengah
+          crossAxisAlignment: CrossAxisAlignment.center, // Horizontal tengah
+          mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'Item: ${item.name}',
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              'ID: ${item!.id}',
+              style: const TextStyle(fontSize: 18),
+              textAlign: TextAlign.center,
             ),
+            const SizedBox(height: 8),
             Text(
-              'ID: ${item.id}',
-              style: const TextStyle(fontSize: 16),
+              'Nama: ${item!.name}',
+              style: const TextStyle(fontSize: 18),
+              textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 8),
+            Text(
+              'Deskripsi: ${item!.description}',
+              style: const TextStyle(fontSize: 18),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
             ElevatedButton(
-              onPressed: onBack,
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-                textStyle: const TextStyle(fontSize: 16),
-              ),
+              onPressed: () {
+                Navigator.pop(context); // Kembali ke HomeScreen
+              },
               child: const Text('Back to Home'),
             ),
           ],
